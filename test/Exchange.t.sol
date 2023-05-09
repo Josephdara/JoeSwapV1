@@ -8,16 +8,28 @@ import "../src/Exchange.sol";
 contract ExchangeTest is Test {
    Exchange public exchange;
    JDT public token;
+   address kofo = vm.addr(3);
 
     function setUp() public {
+        vm.startPrank(kofo);
         token = new JDT();
         exchange = new Exchange(address(token));
+        vm.stopPrank();
     }
 
     function testValues() public view {
        console.log(exchange.name());
        console.log(exchange.symbol());
     }
+    function testProvideTorevert() public{
+         vm.expectRevert();
+        exchange.provideLiquidity(100_000);
+    
+    }
 
-   
+      function testFail_ProvideLqt() public{
+        token.approve(address(exchange), type(uint160).max);
+        exchange.provideLiquidity(100_000);
+       assertEq(exchange.getReserve(), 100_000);
+       }
 }
